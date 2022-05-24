@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Функция подтверждения (да-нет)
+confirm() {
+    read -r -p "${1:-Are you sure? [y/N]} " response
+    case "$response" in
+        [yY][eE][sS]|[yY]) 
+            true
+            ;;
+        *)
+            false
+            ;;
+    esac
+}
+
+# Функция удаления пользователя:
+read -p "Введите имя пользователя для удаления: " user
+if id -u "$user" >/dev/null 2>&1; then
+    if confirm "Вы уверены, что хотите удалить пользователя $user? (y/n or enter for n)"; then
+        killall -u ${user}
+        userdel -f ${user}
+        rm -rf /var/projects/$user
+        rm -rf /home/$user
+    else
+        echo "Выход."
+    fi
+    echo "Пользователь $user удалён."
+else
+    echo "Пользователь $user не существует."
+fi
